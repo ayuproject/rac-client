@@ -547,7 +547,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     throw new Exception("Angkot Tidak Ditemukan");
                 return new AsyncTaskResult<>(dataResult.dataAngkot);
             } catch (Exception e) {
-                Log.e("GetListAngkotTask", e.getMessage());
                 Exception ex = new Exception("Terjadi Kesalahan : " + e.getMessage(), e.getCause());
                 return new AsyncTaskResult<>(ex);
             }
