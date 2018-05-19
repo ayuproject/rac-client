@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:id="@+id/lay_search_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/lay_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Spinner
+                    android:id="@+id/sp_mode_serc1"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    style="@style/SpinnerTheme">
+
+                </Spinner>
+                <EditText
+                    android:id="@+id/txt_serc1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:background="@android:color/transparent"
+                    android:layout_margin="10dp"
+                    android:hint="Cari Angkot"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/lay_srch2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <Spinner
+                        android:id="@+id/sp_mode_serc2"
+                        android:layout_width="40dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="10dp"
+                        style="@style/SpinnerTheme">
+
+                    </Spinner>
+                    <EditText
+                        android:id="@+id/txt_serc2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="20dp"
+                        android:maxLines="1"
+                        android:inputType="text"
+                        android:background="@android:color/transparent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:hint="Cari Angkot"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <ImageView
+                android:id="@+id/btn_hide_show_search"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:src="@drawable/ic_up"/>
+            <ImageView
+                android:id="@+id/btn_search"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_margin="5dp"
+                android:src="@drawable/ic_search"/>
+        </RelativeLayout>
+
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/btn_main_menu"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_rounded"
+        android:layout_gravity="bottom|start"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="-27dp"
+        android:src="@drawable/ic_action_menu"/>
+
+</android.support.design.widget.CoordinatorLayout>

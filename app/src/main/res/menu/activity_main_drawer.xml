@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_all_angkot"
+            android:icon="@drawable/common_full_open_on_phone"
+            android:title="Tampilkan Semua Angkot"/>
+        <item
+            android:id="@+id/nav_search_angkot"
+            android:icon="@drawable/common_full_open_on_phone"
+            android:title="Cari Angkot"/>
+        <item
+            android:id="@+id/nav_search_place_street"
+            android:icon="@drawable/common_full_open_on_phone"
+            android:title="Cari Tempat Atau Jalan"/>
+        <item
+            android:id="@+id/nav_search_place_street_dest"
+            android:icon="@drawable/common_full_open_on_phone"
+            android:title="Cari Dari Kedua Titik"/>
+    </group>
+    <item android:title="Menu Lainnya">
+        <menu>
+            <item
+                android:id="@+id/nav_loc_cianjur"
+                android:icon="@drawable/common_full_open_on_phone"
+                android:title="Posisi Kec Cianjur"/>
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/common_full_open_on_phone"
+                android:title="Tentang" />
+        </menu>
+    </item>
+
+</menu>

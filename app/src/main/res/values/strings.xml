@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">RuteAngkotCianjur</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="about">
+        Nama\n
+        NIM\n
+        Teknik Informatika (S1)\n
+        Universitas Putra Indonesia
+    </string>
+</resources>
