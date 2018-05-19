@@ -403,6 +403,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         List<LatLng> positions = new ArrayList<>();
         positions.add(new LatLng( -6.803476, 107.15325));
         positions.add(new LatLng(-6.84117, 107.122121));
+
         //calculate cianjur boundaries
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (LatLng position : positions) {
