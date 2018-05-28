@@ -30,6 +30,7 @@ public class MapUtil {
     public static class GoogleDomain {
         public static final String ROOT = "https://maps.googleapis.com/maps/api/directions";
         public static String getMapsApiDirectionURL(LatLng[] points) {
+            String key = "key=AIzaSyDYrNGfgY2cwCAuI96qFYQmlTxQHFwHTJs";
             String origin = "origin=" + points[0].latitude + "," + points[0].longitude;
             String waypoints = "waypoints=optimize:true|";
             for (int i = 1; i < points.length; ++i)
@@ -37,7 +38,7 @@ public class MapUtil {
             String destination = "destination=" + points[0].latitude + "," + points[0].longitude;
 
             String sensor = "sensor=false";
-            String params = origin + "&" + waypoints + "&"  + destination + "&" + sensor;
+            String params = origin + "&" + key + "&" + waypoints + "&"  + destination + "&" + sensor;
             String output = "json";
             String url = ROOT + "/" + output + "?" + params;
             return url;
