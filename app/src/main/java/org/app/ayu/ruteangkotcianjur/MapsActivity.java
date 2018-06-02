@@ -120,7 +120,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         final DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         final ImageView btnMainMenu = (ImageView)findViewById(R.id.btn_main_menu);
         dialogAngkot = new DialogAngkot(this);
-
+        AppConfig.TOKEN = "";
 
         //set controls
 
@@ -216,7 +216,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         ).show();
                         return;
                     }
-                    new GetListAngkotTask(MapsActivity.this).execute(AppConfig.HttpDomain.getAngkotByName(txtSrch1.getText().toString()), "" + AppConfig.SearchMode.ANGKOT);
+                    new GetListAngkotTask(MapsActivity.this).execute(
+                            AppConfig.HttpDomain.getUrlAngkotByName(),
+                            AppConfig.HttpDomain.getParamAngkotByName(txtSrch1.getText().toString()),
+                            "" + AppConfig.SearchMode.ANGKOT
+                    );
                 }
                 if (searchMode == AppConfig.SearchMode.PLACE ||
                     searchMode == AppConfig.SearchMode.STREET) {
@@ -230,12 +234,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     if (mode1 == AppConfig.SearchMode.STREET)
                         new GetListAngkotTask(MapsActivity.this).execute(
-                                AppConfig.HttpDomain.getAngkotByStreet(txtSrch1.getText().toString()),
+                                AppConfig.HttpDomain.getUrlAngkotByStreet(),
+                                AppConfig.HttpDomain.getParamAngkotByStreet(txtSrch1.getText().toString()),
                                 "" + AppConfig.SearchMode.STREET
                         );
                     else
                         new GetListAngkotTask(MapsActivity.this).execute(
-                                AppConfig.HttpDomain.getAngkotByPlace(txtSrch1.getText().toString()),
+                                AppConfig.HttpDomain.getUrlAngkotByPlace(),
+                                AppConfig.HttpDomain.getParamAngkotByPlace(txtSrch1.getText().toString()),
                                 "" + AppConfig.SearchMode.PLACE
                         );
                 }
@@ -254,11 +260,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 MapsActivity.this
                         ).execute(
                                 mode1 == AppConfig.SearchMode.STREET ?
-                                    AppConfig.HttpDomain.getAngkotByStreetStreet(
+                                    AppConfig.HttpDomain.getUrlAngkotByStreetStreet() :
+                                    AppConfig.HttpDomain.getUrlAngkotByPlacePlace(),
+                                mode1 == AppConfig.SearchMode.STREET ?
+                                    AppConfig.HttpDomain.getParamAngkotByStreetStreet(
                                             txtSrch1.getText().toString(),
                                             txtSrch2.getText().toString()
                                     ) :
-                                    AppConfig.HttpDomain.getAngkotByPlacePlace(
+                                    AppConfig.HttpDomain.getParamAngkotByPlacePlace(
                                             txtSrch1.getText().toString(),
                                             txtSrch2.getText().toString()
                                     ),
@@ -270,16 +279,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         new GetListAngkotTask(
                                 MapsActivity.this
                         ).execute(
-                                 AppConfig.HttpDomain.getAngkotByStreetPlace(
-                                         mode1 == AppConfig.SearchMode.STREET ?
-                                            txtSrch1.getText().toString() :
-                                            txtSrch2.getText().toString(),
-                                         mode1 == AppConfig.SearchMode.PLACE ?
-                                            txtSrch1.getText().toString() :
-                                            txtSrch2.getText().toString(),
-                                         mode1 == AppConfig.SearchMode.STREET ?
-                                                 "street" : "place"
-                                 ),
+                                AppConfig.HttpDomain.getUrlAngkotByStreetPlace(),
+                                AppConfig.HttpDomain.getParamAngkotByStreetPlace(
+                                        mode1 == AppConfig.SearchMode.STREET ?
+                                                txtSrch1.getText().toString() :
+                                                txtSrch2.getText().toString(),
+                                        mode1 == AppConfig.SearchMode.PLACE ?
+                                                txtSrch1.getText().toString() :
+                                                txtSrch2.getText().toString(),
+                                        mode1 == AppConfig.SearchMode.STREET ?
+                                                "street" : "place"
+                                ),
                                 "" +AppConfig.SearchMode.PLACE_STREET_DEST
                         );
                 }
@@ -339,7 +349,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 item.setChecked(true);
                 setSearchMode(AppConfig.SearchMode.NONE);
                 loadModeOn();
-                new GetListAngkotTask(this).execute(AppConfig.HttpDomain.getAllAngkot(), "" + AppConfig.SearchMode.ANGKOT);
+                new GetListAngkotTask(this).execute(AppConfig.HttpDomain.getUrlAllAngkot(), "", "" + AppConfig.SearchMode.ANGKOT);
                 break;
             case R.id.nav_search_angkot :
                 item.setChecked(true);
@@ -417,7 +427,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onMapLoaded() {
                 setCameraToCianjur();
                 isMapReady = true;
-                loadModeOff();
+                new ValidateApp(MapsActivity.this).execute(AppConfig.HttpDomain.getUrlAuth(),AppConfig.HttpDomain.getParamAuth());
             }
         });
     }
@@ -507,19 +517,56 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    private class ValidateApp extends AsyncTask<String, Void, AsyncTaskResult<DataResult>> {
+        public ValidateApp(Activity context) {
+            this.context = context;
+        }
+
+        private Activity context;
+
+        protected AsyncTaskResult<DataResult> doInBackground(String... params) {
+            String urlS = params[0];
+            String param = params[1];
+            DataResult res = null;
+            try {
+                String rawJSON = new HttpConnection().readUrlPost(urlS, param);
+                res = new ParserJSON().getToken(new JSONObject(rawJSON));
+            } catch (Exception ex) {
+                return new AsyncTaskResult<>(new Exception("Terjadi Kesalahan : " + ex.getMessage()));
+            }
+
+            return new AsyncTaskResult<>(res);
+        }
+
+        protected void onPostExecute(AsyncTaskResult<DataResult> result) {
+            super.onPostExecute(result);
+            loadModeOff();
+            if (result.getError() != null){
+                Toast.makeText(
+                        context,
+                        result.getError().getMessage(),
+                        Toast.LENGTH_LONG
+                ).show();
+                return;
+            }
+            AppConfig.TOKEN = result.getResult().dataString;
+        }
+    }
+
     private class GetListAngkotTask extends AsyncTask<String, Void, AsyncTaskResult<ArrayList<DataAngkot>>> {
         public GetListAngkotTask(Activity context) {
             this.context = context;
         }
         private Activity context;
         @Override
-        protected AsyncTaskResult<ArrayList<DataAngkot>> doInBackground(String... param) {
-            String url = param[0];
-            int mode = Integer.parseInt(param[1]);
+        protected AsyncTaskResult<ArrayList<DataAngkot>> doInBackground(String... params) {
+            String url = params[0];
+            String param = params[1];
+            int mode = Integer.parseInt(params[2]);
             try {
                 String rawJSON = "";
                 HttpConnection http = new HttpConnection();
-                rawJSON = http.readUrl(url);
+                rawJSON = http.readAPIUrlPost(url, param);
                 DataResult dataResult = null;
                 switch (mode) {
                     case AppConfig.SearchMode.PLACE :
@@ -547,7 +594,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     throw new Exception("Angkot Tidak Ditemukan");
                 return new AsyncTaskResult<>(dataResult.dataAngkot);
             } catch (Exception e) {
-                Exception ex = new Exception("Terjadi Kesalahan : " + e.getMessage(), e.getCause());
+                Exception ex = new Exception("Terjadi Kesalahan : " + e.getMessage());
                 return new AsyncTaskResult<>(ex);
             }
         }
@@ -573,11 +620,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         protected AsyncTaskResult<DataAngkot> doInBackground(DataAngkot... dataAngkots) {
             DataAngkot result = dataAngkots[0];
-            String url = AppConfig.HttpDomain.getAngkotById(result.id_angkot);
+            String url = AppConfig.HttpDomain.getUrlAngkotById();
+            String param = AppConfig.HttpDomain.getParamAngkotById(result.id_angkot);
             try {
                 String rawJSON = "";
                 HttpConnection http = new HttpConnection();
-                rawJSON = http.readUrl(url);
+                rawJSON = http.readAPIUrlPost(url, param);
                 result.copyData(new ParserJSON().getAngkot(new JSONObject(rawJSON)));
                 return new AsyncTaskResult<>(result);
             } catch (Exception e) {

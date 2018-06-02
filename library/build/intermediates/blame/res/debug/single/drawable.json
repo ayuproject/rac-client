@@ -6,5 +6,21 @@
     {
         "merged": "C:\\Users\\anon999\\AndroidStudioProjects\\RuteAngkotCianjur\\library\\build\\intermediates\\res\\merged\\debug\\drawable\\below_shadow.xml",
         "source": "C:\\Users\\anon999\\AndroidStudioProjects\\RuteAngkotCianjur\\library\\src\\main\\res\\drawable\\below_shadow.xml"
+    },
+    {
+        "merged": "C:\\Users\\anon999\\AndroidStudioProjects\\RuteAngkotCianjur\\library\\build\\intermediates\\res\\merged\\debug\\drawable\\notification_tile_bg.xml",
+        "source": "C:\\Users\\anon999\\.android\\build-cache\\6ba8318dfb49138633a6aba7c57a1a8bb1972ffa\\output\\res\\drawable\\notification_tile_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\anon999\\AndroidStudioProjects\\RuteAngkotCianjur\\library\\build\\intermediates\\res\\merged\\debug\\drawable\\notification_icon_background.xml",
+        "source": "C:\\Users\\anon999\\.android\\build-cache\\6ba8318dfb49138633a6aba7c57a1a8bb1972ffa\\output\\res\\drawable\\notification_icon_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\anon999\\AndroidStudioProjects\\RuteAngkotCianjur\\library\\build\\intermediates\\res\\merged\\debug\\drawable\\notification_bg.xml",
+        "source": "C:\\Users\\anon999\\.android\\build-cache\\6ba8318dfb49138633a6aba7c57a1a8bb1972ffa\\output\\res\\drawable\\notification_bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\anon999\\AndroidStudioProjects\\RuteAngkotCianjur\\library\\build\\intermediates\\res\\merged\\debug\\drawable\\notification_bg_low.xml",
+        "source": "C:\\Users\\anon999\\.android\\build-cache\\6ba8318dfb49138633a6aba7c57a1a8bb1972ffa\\output\\res\\drawable\\notification_bg_low.xml"
     }
 ]

@@ -21,8 +21,13 @@ import java.util.ArrayList;
  */
 
 public class ParserJSON {
-    public ParserJSON() {
 
+    public DataResult getToken(JSONObject datas) throws JSONException {
+        int resultCount = datas.getInt("result");
+        String resultMsg = datas.getString("msg");
+        String jwt = datas.getString("jwt");
+
+        return new DataResult(resultCount, resultMsg, jwt);
     }
 
     public DataResult getListAngkot(JSONObject datas) throws JSONException {
