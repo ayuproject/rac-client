@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -57,14 +56,11 @@ import org.app.ayu.ruteangkotcianjur.util.DialogAngkot;
 import org.app.ayu.ruteangkotcianjur.util.HttpConnection;
 import org.app.ayu.ruteangkotcianjur.util.MapUtil;
 import org.app.ayu.ruteangkotcianjur.util.ParserJSON;
-import org.app.ayu.ruteangkotcianjur.util.PathJSONParser;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
@@ -385,19 +381,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             clearAnckot();
             return;
         }
-            super.onBackPressed();
+
+        new AlertDialog.Builder(this)
+                .setTitle("Anda yakin ingin keluar ?")
+                .setPositiveButton(
+                        "Ya",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                MapsActivity.super.onBackPressed();
+                            }
+                        }
+                )
+                .setNegativeButton(
+                        "Tidak",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        }
+                )
+                .create()
+                .show();
     }
 
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -741,8 +749,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             try {
                 jObject = new JSONObject(rawJSON);
-                PathJSONParser parser = new PathJSONParser();
-                routes = parser.parse(jObject);
+                MapUtil parser = new MapUtil();
+                routes = parser.parseRouteFormJSON(jObject);
                 return new AsyncTaskResult<>(routes);
             } catch (Exception e) {
                 Log.e("DrawAngkotRouteTask", e.getMessage());
