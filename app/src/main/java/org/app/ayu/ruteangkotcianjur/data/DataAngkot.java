@@ -10,19 +10,21 @@ import java.util.Arrays;
  */
 
 public class DataAngkot {
-    public DataAngkot(String id, String nama, String harga, ArrayList<LatLng> rute, ArrayList<DataLocationStreet> street, ArrayList<DataLocation> place) {
+    public DataAngkot(String id, String nama, String harga, boolean satuJalur, ArrayList<LatLng> rute, ArrayList<DataLocationStreet> street, ArrayList<DataLocation> place) {
         this.id_angkot = id;
         this.nama_angkot = nama;
         this.harga_angkot = harga;
+        this.satu_jalur = satuJalur;
         this.rute_angkot = rute;
         this.street_angkot = street;
         this.place_angkot = place;
     }
 
-    public DataAngkot(String id, String nama, String harga, LatLng[] rute, DataLocationStreet[] street, DataLocation[] place) {
+    public DataAngkot(String id, String nama, String harga, boolean satuJalur, LatLng[] rute, DataLocationStreet[] street, DataLocation[] place) {
         this.id_angkot = id;
         this.nama_angkot = nama;
         this.harga_angkot = harga;
+        this.satu_jalur = satuJalur;
         this.rute_angkot = new ArrayList<>(Arrays.asList(rute));
         this.street_angkot = new ArrayList<>(Arrays.asList(street));
         this.place_angkot = new ArrayList<>(Arrays.asList(place));
@@ -33,6 +35,7 @@ public class DataAngkot {
         this.id_angkot = id;
         this.nama_angkot = nama;
         this.harga_angkot = "";
+        this.satu_jalur = false;
         this.rute_angkot = null;
         this.street_angkot = null;
         this.place_angkot = null;
@@ -44,6 +47,7 @@ public class DataAngkot {
         this.id_angkot = data.id_angkot;
         this.nama_angkot = data.nama_angkot;
         this.harga_angkot = data.harga_angkot;
+        this.satu_jalur = data.satu_jalur;
         this.rute_angkot = data.rute_angkot;
         this.street_angkot = data.street_angkot;
         this.place_angkot = data.place_angkot;
@@ -52,6 +56,7 @@ public class DataAngkot {
     public String id_angkot;
     public String nama_angkot;
     public String harga_angkot;
+    public boolean satu_jalur;
     public ArrayList<LatLng> rute_angkot;
     public ArrayList<DataLocationStreet> street_angkot;
     public ArrayList<DataLocation> place_angkot;

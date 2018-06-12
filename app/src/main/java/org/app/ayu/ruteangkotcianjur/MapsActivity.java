@@ -542,7 +542,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String urlMap = MapUtil.GoogleDomain.getMapsApiDirectionURL(
                 dataAngkot.rute_angkot.toArray(
                         new LatLng[dataAngkot.rute_angkot.size()]
-                )
+                ),
+                dataAngkot.satu_jalur
         );
         Log.e("maps", urlMap);
         currentDataAngkot = dataAngkot;

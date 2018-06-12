@@ -33,13 +33,15 @@ public class MapUtil {
         public static final String ROOT_DIRECTION = "https://maps.googleapis.com/maps/api/directions";
         public static final String ROOT_INFO = "https://maps.googleapis.com/maps/api/place/details";
         public static final String API_KEY = "AIzaSyDYrNGfgY2cwCAuI96qFYQmlTxQHFwHTJs";
-        public static String getMapsApiDirectionURL(LatLng[] points) {
+        public static String getMapsApiDirectionURL(LatLng[] points, boolean satuJalur) {
             String key = "key=" + API_KEY;
             String origin = "origin=" + points[0].latitude + "," + points[0].longitude;
             String waypoints = "waypoints=optimize:true|";
-            for (int i = 1; i < points.length; ++i)
+            String destination = "destination=";
+            destination += satuJalur ? points[points.length - 1].latitude + "," + points[points.length - 1].longitude : points[0].latitude + "," + points[0].longitude;
+            int isatuJalur  = satuJalur ? 1 : 0;
+            for (int i = 1; i < points.length - isatuJalur; ++i)
                 waypoints += points[i].latitude + "," + points[i].longitude + "|";
-            String destination = "destination=" + points[0].latitude + "," + points[0].longitude;
 
             String sensor = "sensor=false";
             String params = origin + "&" + key + "&" + waypoints + "&"  + destination + "&" + sensor;

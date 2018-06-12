@@ -299,6 +299,7 @@ public class ParserJSON {
         int id = angkotObject.getInt("id");
         String nama = angkotObject.getString("nama");
         String harga = angkotObject.getString("harga");
+        boolean satuJalur = angkotObject.getBoolean("satu_jalur");
         JSONArray ruteJSONArray = angkotObject.getJSONArray("rute");
         JSONArray jalanJSONArray = angkotObject.getJSONArray("jalan");
         JSONArray tempatJSONArray = angkotObject.getJSONArray("tempat");
@@ -356,6 +357,7 @@ public class ParserJSON {
                 "" + id,
                 nama,
                 harga,
+                satuJalur,
                 ruteList,
                 jalanList,
                 tempatList
