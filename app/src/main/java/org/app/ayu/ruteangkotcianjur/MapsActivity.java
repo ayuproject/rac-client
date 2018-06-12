@@ -1,17 +1,14 @@
 package org.app.ayu.ruteangkotcianjur;
 
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -865,8 +862,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             List<List<HashMap<String, String>>> routes = result.getResult();
             ArrayList<LatLng> points = null;
             PolylineOptions polyLineOptions = null;
+
             // traversing through routes
-            int count = 0;
             for (int i = 0; i < routes.size(); i++) {
                 points = new ArrayList<>();
                 polyLineOptions = new PolylineOptions();
@@ -878,8 +875,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     double lat = Double.parseDouble(point.get("lat"));
                     double lng = Double.parseDouble(point.get("lng"));
                     LatLng position = new LatLng(lat, lng);
-
-                    //Log.e("way_point", String.format("no %d %f,%f", ++count, lat, lng));
 
                     points.add(position);
                 }
