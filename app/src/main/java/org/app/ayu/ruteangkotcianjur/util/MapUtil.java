@@ -1,5 +1,8 @@
 package org.app.ayu.ruteangkotcianjur.util;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -8,6 +11,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import org.app.ayu.ruteangkotcianjur.R;
+import org.app.ayu.ruteangkotcianjur.data.DataInfowindow;
 import org.app.ayu.ruteangkotcianjur.data.DataLocation;
 import org.app.ayu.ruteangkotcianjur.data.DataLocationStreet;
 import org.json.JSONArray;
@@ -23,14 +28,13 @@ import java.util.List;
  */
 
 public class MapUtil {
-    public MapUtil() {
-
-    }
 
     public static class GoogleDomain {
-        public static final String ROOT = "https://maps.googleapis.com/maps/api/directions";
+        public static final String ROOT_DIRECTION = "https://maps.googleapis.com/maps/api/directions";
+        public static final String ROOT_INFO = "https://maps.googleapis.com/maps/api/place/details";
+        public static final String API_KEY = "AIzaSyDYrNGfgY2cwCAuI96qFYQmlTxQHFwHTJs";
         public static String getMapsApiDirectionURL(LatLng[] points) {
-            String key = "key=AIzaSyDYrNGfgY2cwCAuI96qFYQmlTxQHFwHTJs";
+            String key = "key=" + API_KEY;
             String origin = "origin=" + points[0].latitude + "," + points[0].longitude;
             String waypoints = "waypoints=optimize:true|";
             for (int i = 1; i < points.length; ++i)
@@ -40,7 +44,15 @@ public class MapUtil {
             String sensor = "sensor=false";
             String params = origin + "&" + key + "&" + waypoints + "&"  + destination + "&" + sensor;
             String output = "json";
-            String url = ROOT + "/" + output + "?" + params;
+            String url = ROOT_DIRECTION + "/" + output + "?" + params;
+            return url;
+        }
+
+        public static String getMapsApiDetaiInformationURL(String placeID) {
+            String key = "key=" + API_KEY;
+            String params = "placeid=" + placeID + "&" + key;
+            String output = "json";
+            String url = ROOT_INFO + "/" + output + "?" + params;
             return url;
         }
     }
@@ -89,6 +101,30 @@ public class MapUtil {
                 .position(data.location)
                 .title(data.nama)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+    }
+
+    public DataInfowindow parseDetailLocationFromJSON(JSONObject jObj, Activity context) throws JSONException {
+        JSONObject result = jObj.getJSONObject("result");
+        JSONObject location = result.getJSONObject("geometry").getJSONObject("location");
+        String name = result.getString("name");
+        String adderes = result.getString("formatted_address");
+        String phone = result.getString("international_phone_number").replace(" ", "").trim();
+        Bitmap icon = null;
+        try {
+            icon = new HttpConnection().readBitmapUrl(result.getString("icon"));
+        } catch (Exception ex) {
+            icon = BitmapFactory.decodeResource(context.getResources(), R.drawable.police_71);
+        }
+        return new DataInfowindow(
+                name,
+                adderes,
+                phone,
+                new LatLng(
+                        location.getDouble("lat"),
+                        location.getDouble("lng")
+                ),
+                icon
+        );
     }
 
     /** Receives a JSONObject and returns a list of lists containing latitude and longitude */

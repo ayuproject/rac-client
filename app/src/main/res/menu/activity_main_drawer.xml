@@ -26,6 +26,10 @@
                 android:icon="@drawable/common_full_open_on_phone"
                 android:title="Posisi Kec Cianjur"/>
             <item
+                android:id="@+id/nav_loc_police"
+                android:icon="@drawable/common_full_open_on_phone"
+                android:title="Polres Cianjur"/>
+            <item
                 android:id="@+id/nav_about"
                 android:icon="@drawable/common_full_open_on_phone"
                 android:title="Tentang" />

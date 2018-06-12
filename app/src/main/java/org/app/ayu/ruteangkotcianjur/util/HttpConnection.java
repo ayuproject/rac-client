@@ -1,5 +1,7 @@
 package org.app.ayu.ruteangkotcianjur.util;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -21,6 +23,11 @@ import java.nio.charset.StandardCharsets;
  */
 
 public class HttpConnection {
+
+    public Bitmap readBitmapUrl(String stringUrl) throws Exception {
+        URL url = new URL(stringUrl);
+        return BitmapFactory.decodeStream(url.openConnection().getInputStream());
+    }
     public String readUrl(String mapsApiDirectionsUrl) throws Exception {
         String data = "";
         InputStream iStream = null;

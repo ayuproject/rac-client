@@ -1,12 +1,17 @@
 package org.app.ayu.ruteangkotcianjur;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.NavigationView;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -36,16 +41,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.app.ayu.ruteangkotcianjur.adapter.InfowindowAdapterDetailPlace;
 import org.app.ayu.ruteangkotcianjur.adapter.ListViewAdapterAngkot;
 import org.app.ayu.ruteangkotcianjur.adapter.SpinnerAdapterPlaceStreet;
 import org.app.ayu.ruteangkotcianjur.data.DataAngkot;
+import org.app.ayu.ruteangkotcianjur.data.DataInfowindow;
 import org.app.ayu.ruteangkotcianjur.data.DataLocation;
 import org.app.ayu.ruteangkotcianjur.data.DataLocationStreet;
+import org.app.ayu.ruteangkotcianjur.data.DataPolice;
 import org.app.ayu.ruteangkotcianjur.data.DataResult;
 import org.app.ayu.ruteangkotcianjur.data.listview.DLVAngkot;
 import org.app.ayu.ruteangkotcianjur.data.listview.DLVAngkotPlace;
@@ -62,7 +71,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
     private SlidingUpPanelLayout sLayout;
@@ -79,8 +88,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Button btnDetailAngkot;
     private DataAngkot currentDataAngkot;
     private int searchMode;
-    private boolean isMapReady;
     private LatLngBounds cianjurBounds;
+    private DataPolice dataPolice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +97,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
 
         //initialize variable and class
-        isMapReady = false;
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -98,25 +106,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //initialize controls
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        txtSrch1 = (EditText)findViewById(R.id.txt_serc1);
-        txtSrch2 = (EditText)findViewById(R.id.txt_serc2);
-        txtAngkot = (TextView)findViewById(R.id.txt_d_angkot);
-        spSrch1 = (Spinner)findViewById(R.id.sp_mode_serc1);
-        spSrch2 = (Spinner)findViewById(R.id.sp_mode_serc2);
-        laySrch = (LinearLayout)findViewById(R.id.lay_search);
-        laySrch2 = (LinearLayout)findViewById(R.id.lay_srch2);
-        laySrchParent = (LinearLayout)findViewById(R.id.lay_search_parent);
-        layAngkot = (RelativeLayout)findViewById(R.id.lay_angkot);
-        lvApp = (ListView)findViewById(R.id.lv_app);
-        sLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
-        btnHideShowSearch = (ImageView)findViewById(R.id.btn_hide_show_search);
-        btnSearch = (ImageView)findViewById(R.id.btn_search);
-        btnDetailAngkot = (Button)findViewById(R.id.btn_detail_angkot);
-        progressBar = (ProgressBar)findViewById(R.id.progress_bar);
-        final DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
-        final ImageView btnMainMenu = (ImageView)findViewById(R.id.btn_main_menu);
+        txtSrch1 = (EditText) findViewById(R.id.txt_serc1);
+        txtSrch2 = (EditText) findViewById(R.id.txt_serc2);
+        txtAngkot = (TextView) findViewById(R.id.txt_d_angkot);
+        spSrch1 = (Spinner) findViewById(R.id.sp_mode_serc1);
+        spSrch2 = (Spinner) findViewById(R.id.sp_mode_serc2);
+        laySrch = (LinearLayout) findViewById(R.id.lay_search);
+        laySrch2 = (LinearLayout) findViewById(R.id.lay_srch2);
+        laySrchParent = (LinearLayout) findViewById(R.id.lay_search_parent);
+        layAngkot = (RelativeLayout) findViewById(R.id.lay_angkot);
+        lvApp = (ListView) findViewById(R.id.lv_app);
+        sLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        btnHideShowSearch = (ImageView) findViewById(R.id.btn_hide_show_search);
+        btnSearch = (ImageView) findViewById(R.id.btn_search);
+        btnDetailAngkot = (Button) findViewById(R.id.btn_detail_angkot);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final ImageView btnMainMenu = (ImageView) findViewById(R.id.btn_main_menu);
         dialogAngkot = new DialogAngkot(this);
         AppConfig.TOKEN = "";
+        dataPolice = null;
 
         //set controls
 
@@ -144,7 +153,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         lvApp.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                new GetAngkotTask().execute((DataAngkot)view.getTag());
+                new GetAngkotTask().execute((DataAngkot) view.getTag());
                 loadModeOn();
             }
         });
@@ -153,7 +162,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 txtSrch1.setHint(
-                        (int)((Object[])view.getTag())[0] == AppConfig.SearchMode.PLACE ?
+                        (int) ((Object[]) view.getTag())[0] == AppConfig.SearchMode.PLACE ?
                                 "Cari Tempat" : "Cari Jalan"
                 );
             }
@@ -167,7 +176,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 txtSrch2.setHint(
-                        (int)((Object[])view.getTag())[0] == AppConfig.SearchMode.PLACE ?
+                        (int) ((Object[]) view.getTag())[0] == AppConfig.SearchMode.PLACE ?
                                 "Cari Tempat" : "Cari Jalan"
                 );
             }
@@ -219,7 +228,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     );
                 }
                 if (searchMode == AppConfig.SearchMode.PLACE ||
-                    searchMode == AppConfig.SearchMode.STREET) {
+                        searchMode == AppConfig.SearchMode.STREET) {
                     if (txtSrch1.getText().toString().equals("")) {
                         Toast.makeText(
                                 MapsActivity.this,
@@ -243,7 +252,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 if (searchMode == AppConfig.SearchMode.PLACE_STREET_DEST) {
                     if (txtSrch1.getText().toString().equals("") ||
-                        txtSrch2.getText().toString().equals("")) {
+                            txtSrch2.getText().toString().equals("")) {
                         Toast.makeText(
                                 MapsActivity.this,
                                 "Isi Pencarian",
@@ -256,20 +265,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 MapsActivity.this
                         ).execute(
                                 mode1 == AppConfig.SearchMode.STREET ?
-                                    AppConfig.HttpDomain.getUrlAngkotByStreetStreet() :
-                                    AppConfig.HttpDomain.getUrlAngkotByPlacePlace(),
+                                        AppConfig.HttpDomain.getUrlAngkotByStreetStreet() :
+                                        AppConfig.HttpDomain.getUrlAngkotByPlacePlace(),
                                 mode1 == AppConfig.SearchMode.STREET ?
-                                    AppConfig.HttpDomain.getParamAngkotByStreetStreet(
-                                            txtSrch1.getText().toString(),
-                                            txtSrch2.getText().toString()
-                                    ) :
-                                    AppConfig.HttpDomain.getParamAngkotByPlacePlace(
-                                            txtSrch1.getText().toString(),
-                                            txtSrch2.getText().toString()
-                                    ),
+                                        AppConfig.HttpDomain.getParamAngkotByStreetStreet(
+                                                txtSrch1.getText().toString(),
+                                                txtSrch2.getText().toString()
+                                        ) :
+                                        AppConfig.HttpDomain.getParamAngkotByPlacePlace(
+                                                txtSrch1.getText().toString(),
+                                                txtSrch2.getText().toString()
+                                        ),
                                 mode1 == AppConfig.SearchMode.STREET ?
-                                    "" + (AppConfig.SearchMode.STREET | AppConfig.SearchMode.PLACE_STREET_DEST) :
-                                    "" + (AppConfig.SearchMode.PLACE | AppConfig.SearchMode.PLACE_STREET_DEST)
+                                        "" + (AppConfig.SearchMode.STREET | AppConfig.SearchMode.PLACE_STREET_DEST) :
+                                        "" + (AppConfig.SearchMode.PLACE | AppConfig.SearchMode.PLACE_STREET_DEST)
                         );
                     else
                         new GetListAngkotTask(
@@ -286,12 +295,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         mode1 == AppConfig.SearchMode.STREET ?
                                                 "street" : "place"
                                 ),
-                                "" +AppConfig.SearchMode.PLACE_STREET_DEST
+                                "" + AppConfig.SearchMode.PLACE_STREET_DEST
                         );
                 }
                 View viewKey = MapsActivity.this.getCurrentFocus();
                 if (viewKey != null) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(MapsActivity.this.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(MapsActivity.this.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
                 loadModeOn();
@@ -320,6 +329,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.nav_loc_cianjur :
                 if (cianjurBounds != null)
                     setCameraToCianjur();
+                return true;
+            case R.id.nav_loc_police :
+                if (dataPolice != null) {
+                    if (mMap != null) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLng(dataPolice.dataInfowindow.location));
+                        dataPolice.isInfoWindown = true;
+                        Marker m = mMap.addMarker(
+                                new MarkerOptions()
+                                        .position(dataPolice.dataInfowindow.location)
+                                        .title(dataPolice.dataInfowindow.name)
+                                        .icon(BitmapDescriptorFactory.fromBitmap(dataPolice.dataInfowindow.icon))
+                        );
+                        m.setTag(dataPolice.dataInfowindow);
+                        m.showInfoWindow();
+                    }
+                }
+
                 return true;
             case R.id.nav_about :
                 LayoutInflater li = LayoutInflater.from(this);
@@ -382,6 +408,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
 
+        if (dataPolice.isInfoWindown) {
+            if (mMap != null)
+                mMap.clear();
+            dataPolice.isInfoWindown = false;
+            return;
+        }
+
         new AlertDialog.Builder(this)
                 .setTitle("Anda yakin ingin keluar ?")
                 .setPositiveButton(
@@ -416,6 +449,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 0
         );
 
+        mMap.setInfoWindowAdapter(new InfowindowAdapterDetailPlace(this));
+        mMap.setOnInfoWindowClickListener(this);
+
         //set camera to cianjur bounds
         //cianjur bounds
         List<LatLng> positions = new ArrayList<>();
@@ -433,9 +469,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+
                 setCameraToCianjur();
-                isMapReady = true;
                 new ValidateApp(MapsActivity.this).execute(AppConfig.HttpDomain.getUrlAuth(),AppConfig.HttpDomain.getParamAuth());
+                new GetPlaceById(MapsActivity.this).execute(MapUtil.GoogleDomain.getMapsApiDetaiInformationURL("ChIJM_MZAvlSaC4RXcoLcNnBSaM"));
             }
         });
     }
@@ -523,6 +560,51 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 )
         );
 
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        if (marker.getTag() instanceof DataInfowindow) {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + ((DataInfowindow)marker.getTag()).phone_number));
+            startActivity(intent);
+        }
+    }
+
+    private class GetPlaceById extends AsyncTask<String, Void, AsyncTaskResult<DataInfowindow>> {
+        public GetPlaceById(Activity context) {
+            this.context = context;
+        }
+
+        private Activity context;
+
+        protected AsyncTaskResult<DataInfowindow> doInBackground(String... params) {
+            String urlS = params[0];
+            DataInfowindow res = null;
+            try {
+                String rawJSON = new HttpConnection().readUrl(urlS);
+                res = new MapUtil().parseDetailLocationFromJSON(new JSONObject(rawJSON), context);
+            } catch (Exception ex) {
+                return new AsyncTaskResult<>(new Exception("Terjadi Kesalahan : " + ex.getMessage()));
+            }
+
+            return new AsyncTaskResult<>(res);
+        }
+
+        protected void onPostExecute(AsyncTaskResult<DataInfowindow> result) {
+            super.onPostExecute(result);
+            if (result.getError() != null){
+                Toast.makeText(
+                        context,
+                        result.getError().getMessage(),
+                        Toast.LENGTH_LONG
+                ).show();
+                return;
+            }
+            //create marker with info window
+            DataInfowindow data = result.getResult();
+            dataPolice = new DataPolice(data);
+        }
     }
 
     private class ValidateApp extends AsyncTask<String, Void, AsyncTaskResult<DataResult>> {
@@ -679,22 +761,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 DLVAngkotStreet street = (DLVAngkotStreet)dataAngkot;
                 PolygonOptions bounds = new MapUtil().drawBoundarieStreet(street.street.northeast, street.street.southwest);
                 mMap.addPolygon(bounds);
-                mMap.addMarker(
+                Marker m = mMap.addMarker(
                         new MarkerOptions()
                                 .position(street.street.location)
                                 .title(street.street.nama)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                 );
+                m.setTag(dataAngkot);
+                m.showInfoWindow();
                 LatLngBounds latLngBounds = new MapUtil().getBoundStreet(street.street.northeast, street.street.southwest);
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 40));
             } else if (dataAngkot instanceof DLVAngkotPlace) {
                 DLVAngkotPlace place = (DLVAngkotPlace)dataAngkot;
-                mMap.addMarker(
+                Marker m = mMap.addMarker(
                         new MarkerOptions()
                                 .position(place.place.location)
                                 .title(place.place.nama)
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                 );
+                m.setTag(dataAngkot);
+                m.showInfoWindow();
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.place.location, 15));
             } else if (dataAngkot instanceof DLVAngkotStreetPlaceDirection) {
                 DLVAngkotStreetPlaceDirection streetPlace = (DLVAngkotStreetPlaceDirection)dataAngkot;
@@ -702,25 +788,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 DataLocation location2 = streetPlace.data_location2;
                 if (location1 instanceof DataLocationStreet){
                     PolygonOptions bounds = new MapUtil().drawBoundarieStreet(((DataLocationStreet)location1).northeast, ((DataLocationStreet)location1).southwest);
-                    mMap.addMarker(
+                    Marker m = mMap.addMarker(
                             new MapUtil().getMarkForStreet(location1)
                     );
+                    m.setTag(dataAngkot);
+                    m.showInfoWindow();
                     mMap.addPolygon(bounds);
                 } else {
-                    mMap.addMarker(
+                    Marker m = mMap.addMarker(
                             new MapUtil().getMarkForPlace(location1)
                     );
+                    m.setTag(dataAngkot);
+                    m.showInfoWindow();
                 }
                 if (location2 instanceof DataLocationStreet){
                     PolygonOptions bounds = new MapUtil().drawBoundarieStreet(((DataLocationStreet)location2).northeast, ((DataLocationStreet)location2).southwest);
-                    mMap.addMarker(
+                    Marker m = mMap.addMarker(
                             new MapUtil().getMarkForStreet(location2)
                     );
+                    m.setTag(dataAngkot);
+                    m.showInfoWindow();
                     mMap.addPolygon(bounds);
                 } else {
-                    mMap.addMarker(
+                    Marker m = mMap.addMarker(
                             new MapUtil().getMarkForPlace(location2)
                     );
+                    m.setTag(dataAngkot);
+                    m.showInfoWindow();
                 }
                 LatLngBounds zoomCamera = new MapUtil().getBounds(
                         new LatLng[] {
