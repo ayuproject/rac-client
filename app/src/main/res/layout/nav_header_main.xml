@@ -14,7 +14,7 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_gravity="center_horizontal"
-        app:srcCompat="@drawable/car" />
+        app:srcCompat="@drawable/car2" />
 
     <TextView
         android:id="@+id/textView"
