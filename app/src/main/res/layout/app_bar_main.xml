@@ -112,4 +112,15 @@
         android:layout_marginLeft="-27dp"
         android:src="@drawable/ic_action_menu"/>
 
+    <ImageView
+        android:id="@+id/btn_main_phone"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_rounded"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="85dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/ic_action_menu"/>
+
 </RelativeLayout>

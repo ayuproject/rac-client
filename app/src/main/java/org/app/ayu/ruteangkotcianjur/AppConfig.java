@@ -17,7 +17,7 @@ public class AppConfig {
     public static String TOKEN;
 
     public static class HttpDomain {
-        public static final String ROOT = "http://192.168.43.135/ruteangkotcianjur/app";
+        public static final String ROOT = "http://192.168.100.5/ruteangkotcianjur/app";
         public static final String ANGKOT = "angkot-result.php";
         public static final String ANGKOT_ALL = "all-angkot-result.php";
         public static final String ANGKOT_STREET = "street-result.php";

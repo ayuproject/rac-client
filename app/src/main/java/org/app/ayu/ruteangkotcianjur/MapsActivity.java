@@ -2,6 +2,7 @@ package org.app.ayu.ruteangkotcianjur;
 
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -22,6 +23,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -68,7 +70,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnInfoWindowClickListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap mMap;
     private SlidingUpPanelLayout sLayout;
@@ -78,7 +80,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RelativeLayout layAngkot;
     private NavigationView navigationView;
     private ListView lvApp;
-    private ImageView btnSearch, btnHideShowSearch;
+    private ImageView btnSearch, btnHideShowSearch, btnPhone;
     private ProgressBar progressBar;
     private TextView txtAngkot;
     private DialogAngkot dialogAngkot;
@@ -87,6 +89,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int searchMode;
     private LatLngBounds cianjurBounds;
     private DataPolice dataPolice;
+    private AlertDialog dialogMenuInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +120,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnHideShowSearch = (ImageView) findViewById(R.id.btn_hide_show_search);
         btnSearch = (ImageView) findViewById(R.id.btn_search);
         btnDetailAngkot = (Button) findViewById(R.id.btn_detail_angkot);
+        btnPhone = (ImageView)findViewById(R.id.btn_main_phone);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         final ImageView btnMainMenu = (ImageView) findViewById(R.id.btn_main_menu);
@@ -312,26 +316,47 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        // TODO call police
+        btnPhone.setVisibility(View.GONE);
+        btnPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + dataPolice.dataInfowindow.phone_number));
+                startActivity(intent);
+            }
+        });
+
         //set app search
         setSearchMode(AppConfig.SearchMode.NONE);
-    }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.nav_loc_cianjur :
-                if (cianjurBounds != null)
-                    setCameraToCianjur();
-                return true;
-            case R.id.nav_loc_police :
+        //TODO dialog menu information
+        LayoutInflater lu = LayoutInflater.from(this);
+        final View Input = lu.inflate(R.layout.dialog_manu_information, null);
+        AlertDialog.Builder aBuild = new AlertDialog.Builder(this);
+        aBuild.setView(Input);
+        ((ImageButton) Input.findViewById(R.id.imagebutton)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        ((ImageButton) Input.findViewById(R.id.imagebutton1)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, InformationActivity.class);
+                intent.putExtra("filename", "rambu_lalu_lintas.html");
+                startActivity(intent);
+            }
+        });
+        ((ImageButton) Input.findViewById(R.id.imagebutton2)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 if (dataPolice != null) {
                     if (mMap != null) {
                         mMap.animateCamera(CameraUpdateFactory.newLatLng(dataPolice.dataInfowindow.location));
                         dataPolice.isInfoWindown = true;
+                        btnPhone.setVisibility(View.VISIBLE);
                         Marker m = mMap.addMarker(
                                 new MarkerOptions()
                                         .position(dataPolice.dataInfowindow.location)
@@ -342,7 +367,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         m.showInfoWindow();
                     }
                 }
+                dialogMenuInfo.dismiss();
+            }
+        });
+        aBuild.setPositiveButton(
+                "OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }
+        );
+        dialogMenuInfo = aBuild.create();
+    }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        int id = item.getItemId();
+        Fragment fragment = null;
+        switch (id) {
+            case R.id.nav_loc_cianjur :
+                if (cianjurBounds != null)
+                    setCameraToCianjur();
                 return true;
             case R.id.nav_about :
                 LayoutInflater li = LayoutInflater.from(this);
@@ -361,8 +411,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 );
                 aBuilder.create().show();
                 return true;
+            case R.id.nav_loc_information:
+                dialogMenuInfo.show();
+                return true;
         }
-        clearAnckot();
         switch (id) {
             case R.id.nav_all_angkot :
                 item.setChecked(true);
@@ -409,6 +461,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (mMap != null)
                 mMap.clear();
             dataPolice.isInfoWindown = false;
+            btnPhone.setVisibility(View.GONE);
             return;
         }
 
@@ -447,7 +500,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
 
         mMap.setInfoWindowAdapter(new InfowindowAdapterDetailPlace(this));
-        mMap.setOnInfoWindowClickListener(this);
 
         //set camera to cianjur bounds
         //cianjur bounds
@@ -558,15 +610,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 )
         );
 
-    }
-
-    @Override
-    public void onInfoWindowClick(Marker marker) {
-        if (marker.getTag() instanceof DataInfowindow) {
-            Intent intent = new Intent(Intent.ACTION_DIAL);
-            intent.setData(Uri.parse("tel:" + ((DataInfowindow)marker.getTag()).phone_number));
-            startActivity(intent);
-        }
     }
 
     private class GetPlaceById extends AsyncTask<String, Void, AsyncTaskResult<DataInfowindow>> {
