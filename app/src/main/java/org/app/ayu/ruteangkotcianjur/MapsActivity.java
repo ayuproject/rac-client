@@ -129,7 +129,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         dataPolice = null;
 
         //set controls
-
         loadModeOn();
 
         spSrch1.setAdapter(new SpinnerAdapterPlaceStreet(this));
@@ -338,13 +337,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ((ImageButton) Input.findViewById(R.id.imagebutton)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(MapsActivity.this, InformationActivity.class);
+                intent.putExtra("filetype", "pdf");
+                intent.putExtra("filename", "perda.pdf");
+                startActivity(intent);
             }
         });
         ((ImageButton) Input.findViewById(R.id.imagebutton1)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, InformationActivity.class);
+                intent.putExtra("filetype", "html");
                 intent.putExtra("filename", "rambu_lalu_lintas.html");
                 startActivity(intent);
             }
@@ -518,7 +521,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
-
                 setCameraToCianjur();
                 new ValidateApp(MapsActivity.this).execute(AppConfig.HttpDomain.getUrlAuth(),AppConfig.HttpDomain.getParamAuth());
                 new GetPlaceById(MapsActivity.this).execute(MapUtil.GoogleDomain.getMapsApiDetaiInformationURL("ChIJM_MZAvlSaC4RXcoLcNnBSaM"));
